@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Project Path="Application/Application.csproj" />
+  <Project Path="Domain/Domain.csproj" />
+  <Project Path="Infrastructure/Infrastructure.csproj" />
+  <Project Path="IoC/IoC.csproj" />
+  <Project Path="WebApi/WebApi.csproj" />
+  <Project Path="WorkerService/WorkerService.csproj" Id="bcde7148-3d9f-4cc2-80c0-54064cfa7469" />
+</Solution>
