@@ -1,5 +1,6 @@
 using Domain.Repositories;
 using Domain.Services;
+using Infrastructure.Configuration;
 using Infrastructure.Repositories;
 using Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
@@ -13,20 +14,34 @@ public static class InfrastructureServiceCollectionExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services
-            .AddRedisCache(configuration)
+            .AddRedisConfiguration(configuration)
+            .AddRedisCache()
             .AddRepositories()
             .AddDomainServices();
 
         return services;
     }
 
-    private static IServiceCollection AddRedisCache(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddRedisConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
-        var redisConnection = configuration.GetConnectionString("Redis")
-            ?? throw new InvalidOperationException("Redis connection string not found");
+        services.Configure<RedisSettings>(configuration.GetSection(RedisSettings.SectionName));
+        
+        return services;
+    }
 
+    private static IServiceCollection AddRedisCache(this IServiceCollection services)
+    {
         services.AddSingleton<IConnectionMultiplexer>(sp =>
-            ConnectionMultiplexer.Connect(redisConnection));
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var redisSettings = configuration.GetSection(RedisSettings.SectionName).Get<RedisSettings>()
+                ?? throw new InvalidOperationException("Redis settings not found");
+
+            if (string.IsNullOrWhiteSpace(redisSettings.ConnectionString))
+                throw new InvalidOperationException("Redis connection string is required");
+
+            return ConnectionMultiplexer.Connect(redisSettings.ConnectionString);
+        });
 
         services.AddSingleton<ICacheService, RedisCacheService>();
         services.AddSingleton<IMessageBusService, RedisMessageBusService>();
