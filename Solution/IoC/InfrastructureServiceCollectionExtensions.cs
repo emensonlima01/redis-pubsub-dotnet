@@ -29,6 +29,7 @@ public static class InfrastructureServiceCollectionExtensions
             ConnectionMultiplexer.Connect(redisConnection));
 
         services.AddSingleton<ICacheService, RedisCacheService>();
+        services.AddSingleton<IMessageBusService, RedisMessageBusService>();
 
         return services;
     }

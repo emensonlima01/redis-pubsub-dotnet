@@ -1,22 +1,24 @@
 using Application.DTOs;
 using Domain.Entities;
-using Domain.Repositories;
+using Domain.Events;
+using Domain.Services;
 
 namespace Application.UseCases;
 
-public class ReceivePaymentUseCase(IPaymentRepository paymentRepository)
+public class ReceivePaymentUseCase(IMessageBusService messageBusService)
 {
+    private const string PaymentReceivedChannel = "payment:received";
+
     public async Task Handle(ReceivePaymentRequest request)
     {
-        var payment = new Payment
+        var paymentEvent = new PaymentReceivedEvent
         {
             Id = Guid.NewGuid(),
             Amount = request.Amount,
             Description = request.Description,
-            CreatedAt = DateTime.UtcNow,
-            Status = PaymentStatus.Received
+            CreatedAt = DateTime.UtcNow
         };
 
-        await paymentRepository.SaveAsync(payment);
+        await messageBusService.PublishAsync(PaymentReceivedChannel, paymentEvent);
     }
 }

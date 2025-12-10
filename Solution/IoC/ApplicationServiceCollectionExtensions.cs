@@ -1,5 +1,5 @@
-using Application.UseCases;
 using Microsoft.Extensions.DependencyInjection;
+using Application.UseCases;
 
 namespace IoC;
 
@@ -17,6 +17,7 @@ public static class ApplicationServiceCollectionExtensions
         services.AddScoped<ReceivePaymentUseCase>();
         services.AddScoped<GetPaymentUseCase>();
         services.AddScoped<CancelPaymentUseCase>();
+        services.AddScoped<ProcessPaymentUseCase>();
 
         return services;
     }
