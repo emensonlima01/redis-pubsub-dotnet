@@ -1,4 +1,3 @@
-using Application.UseCases;
 using Domain.Events;
 using Domain.Services;
 
@@ -6,7 +5,7 @@ namespace WorkerService
 {
     public class Worker(
         IMessageBusService messageBusService,
-        ProcessPaymentUseCase processPaymentUseCase) : BackgroundService
+        IEventHandler eventHandler) : BackgroundService
     {
         private const string PaymentReceivedChannel = "payment:received";
 
@@ -14,7 +13,7 @@ namespace WorkerService
         {
             await messageBusService.SubscribeAsync<PaymentReceivedEvent>(
                 PaymentReceivedChannel,
-                async (paymentEvent) => await processPaymentUseCase.Handle(paymentEvent)
+                eventHandler
             );
 
             while (!stoppingToken.IsCancellationRequested)

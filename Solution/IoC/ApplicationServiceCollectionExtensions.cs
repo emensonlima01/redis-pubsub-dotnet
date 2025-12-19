@@ -1,5 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using Application.Handlers;
 using Application.UseCases;
+using Domain.Events;
+using Domain.Services;
 
 namespace IoC;
 
@@ -17,7 +20,8 @@ public static class ApplicationServiceCollectionExtensions
         services.AddScoped<ReceivePaymentUseCase>();
         services.AddScoped<GetPaymentUseCase>();
         services.AddScoped<CancelPaymentUseCase>();
-        services.AddScoped<ProcessPaymentUseCase>();
+        services.AddSingleton<ProcessPaymentUseCase>();
+        services.AddSingleton<IEventHandler, PaymentReceivedHandler>();
 
         return services;
     }

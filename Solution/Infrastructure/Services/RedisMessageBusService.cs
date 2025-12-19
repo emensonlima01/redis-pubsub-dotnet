@@ -25,7 +25,7 @@ public class RedisMessageBusService : IMessageBusService
         await subscriber.PublishAsync(RedisChannel.Literal(channel), serializedMessage);
     }
 
-    public async Task SubscribeAsync<T>(string channel, Func<T, Task> handler) where T : class
+    public async Task SubscribeAsync<T>(string channel, IEventHandler eventHandler) where T : class
     {
         var subscriber = _connectionMultiplexer.GetSubscriber();
         
@@ -36,7 +36,7 @@ public class RedisMessageBusService : IMessageBusService
                 var deserializedMessage = JsonSerializer.Deserialize<T>(message.ToString(), _jsonOptions);
                 if (deserializedMessage != null)
                 {
-                    await handler(deserializedMessage);
+                    await eventHandler.Handle(deserializedMessage);
                 }
             }
         });
